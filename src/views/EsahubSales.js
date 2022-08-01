@@ -16,27 +16,70 @@ import {
 
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
+import SimpleLoading from "components/Loading/SimpleLoading";
 
 function EsahubSales() {
-    const selectRef = useRef();
-    const [option, setOption] = useState(0);
-    const [preview, setPreview] = useState("");
+  const selectRef = useRef();
+  const [option, setOption] = useState(null);
+  const [preview, setPreview] = useState("");
+  const [hasRequest, setHasRequest] = useState(false);
 
-    useEffect( () =>{
-        moment.locale("es")
-        console.log({option, preview})
-    }, [option])
+  useEffect(() => {
+    moment.locale("es");
+    console.log({option, selectRef, preview , hasRequest});
+  }, [option, hasRequest]);
 
-    const handleOption = evt => {
-        setOption(evt.target.value)
-        setPreview(evt.target.value)
-    }
+  const handleOption = (evt) => {
+    let transformOption = moment(evt.target.value).format("YYYYMMDD");
+    console.log({ transformOption });
+    setOption(evt.target.value);
+    setPreview(evt.target.value);
+  };
 
-    const handleFetch = (evt) => {
-        axios
-            .get("https://www.oceanomedicina.net/laravel-foclis/api/hola")
-            .then((res) => console.log(res));
-    };
+  const handleLoding = (status) =>{
+    setHasRequest(status);
+  }
+
+  const handleFetch = (evt, fromPeriod) => {
+    handleLoding(true)
+    const url = `https://www.oceanomedicina.net/laravel-foclis/api/esahub/ventas-por-pedido${
+      fromPeriod && `?period=${fromPeriod}`
+    }`;
+
+    axios.get(url)
+      .then((res) => {
+        console.log({ data: res.data, selectRef });
+        handleToast("Completado!", "success")
+        selectRef.current.value = null
+        setOption(null);
+        setPreview("");
+        handleLoding(false)
+
+      }).catch((err) => {
+        console.error({ err });
+        handleToast("Error!", "error")
+        handleLoding(false);
+      });
+
+  };
+
+  const handleToast = (title, icon) =>{
+    Swal.fire({
+      title,
+      icon,
+      toast: true,
+      animation: true,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      position: 'bottom-right',
+      didOpen: (toast) => {
+        toast.addEventListener("mouseenter", Swal.stopTimer);
+        toast.addEventListener("mouseleave", Swal.resumeTimer);
+      },
+    });
+  }
 
   return (
     <>
@@ -55,7 +98,7 @@ function EsahubSales() {
                 <CardBody>
                   <Row>
                     <Col md="4" xs="5">
-                      <Label for="monthSelect" >
+                      <Label for="monthSelect">
                         Seleccione el periodo mensual
                       </Label>
                       <Input
@@ -63,11 +106,9 @@ function EsahubSales() {
                         type="select"
                         name="select"
                         id="monthSelect"
-                        onChange={ handleOption }
+                        onChange={handleOption}
                       >
-                        <option disabled defaultValue>
-                          Seleccione una opcion
-                        </option>
+                        <option defaultValue>Seleccione una opcion</option>
                         <option value={moment("1/1/22").format("L")}>
                           Enero
                         </option>
@@ -106,45 +147,57 @@ function EsahubSales() {
                         </option>
                       </Input>
                     </Col>
-                    
-                    { 
-                        preview !== "" ? 
-                            <Col md="8" xs="7">
-                            <div className="numbers">
-                                <p className="card-category">Periodo</p>
-                                <CardTitle tag="p">{moment(preview).format("DD/MM/YYYY")} hasta {moment(preview).endOf("month").format("DD/MM/YYYY").toString()}</CardTitle>
-                            </div>
-                            </Col>
-                            :
-                            null
-                    }
-                    
+
+                    {preview !== "" && (
+                      <Col md="8" xs="7">
+                        <div className="numbers">
+                          <p className="card-category">Periodo</p>
+                          <CardTitle tag="p">
+                            {moment(preview).format("DD/MM/YYYY")} hasta{" "}
+                            {moment(preview)
+                              .endOf("month")
+                              .format("DD/MM/YYYY")
+                              .toString()}
+                          </CardTitle>
+                        </div>
+                      </Col>
+                    )}
                   </Row>
                 </CardBody>
                 <CardFooter>
                   <hr />
+
+{ hasRequest ? <SimpleLoading /> : <Button
+                    color="success"
+                    style={{ marginLeft: "auto", display: "block" }}
+                    disabled={option === null || hasRequest ? true : false}
+                    onClick={(evt) => handleFetch(evt, option)}
+                  >
+                    Solicitar
+                  </Button>}
                   
-                  <Button color="success" style={{ marginLeft: "auto", display: "block"}} onClick={ handleFetch }>Solicitar</Button>
                 </CardFooter>
               </Card>
             </FormGroup>
           </Col>
           <Col lg="12" md="12" sm="12">
-              <Card className="card-stats">
-                <CardBody >
-                    <Row>
-                        <Col>
-                        <div className="icon-big text-center icon-warning">
-                            <i className="nc-icon nc-alert-circle-i text-info" />
-                        </div>
-                        </Col>
-                        <Col md="9" xs="12">
-                            <p className="mt-2 mb-0">Actualmente esta establecido que la consulta de las ventas en ESAHUB se realizan a principio de mes</p>
-                        </Col>
-                    </Row>
-                    
-                </CardBody>
-              </Card>
+            <Card className="card-stats">
+              <CardBody>
+                <Row>
+                  <Col>
+                    <div className="icon-big text-center icon-warning">
+                      <i className="nc-icon nc-alert-circle-i text-info" />
+                    </div>
+                  </Col>
+                  <Col md="9" xs="12">
+                    <p className="mt-2 mb-0">
+                      Actualmente esta establecido que la consulta de las ventas
+                      en ESAHUB se realizan a principio de mes
+                    </p>
+                  </Col>
+                </Row>
+              </CardBody>
+            </Card>
           </Col>
         </Row>
       </div>

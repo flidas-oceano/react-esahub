@@ -27,13 +27,13 @@ import UserPage from "views/User.js";
 import EsahubSales from "views/EsahubSales.js";
 
 var routes = [
-  {
+  /* {
     path: "/dashboard",
     name: "Dashboard",
     icon: "nc-icon nc-bank",
     component: Dashboard,
     layout: "/admin"
-  },
+  }, */
   {
     path: "/esahub",
     name: "Esahub",
@@ -41,7 +41,7 @@ var routes = [
     component: EsahubSales,
     layout: "/admin"
   },
-  {
+  /* {
     path: "/icons",
     name: "Icons",
     icon: "nc-icon nc-diamond",
@@ -82,6 +82,6 @@ var routes = [
     icon: "nc-icon nc-caps-small",
     component: Typography,
     layout: "/admin"
-  }
+  } */
 ];
 export default routes;
