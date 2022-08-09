@@ -48,12 +48,17 @@ function EsahubSales() {
     axios.get(url)
       .then((res) => {
         console.log({ data: res.data });
-        handleToast("Completado!", "success")
+        const { AppendResposeBody, UpdateResposeHeader, new_values } = res.data
+        let message = `
+            Solicitud completa!, nuevos datos que se sumaron al Sheet: ${new_values.length}
+        `
+        handleToast(message, "success")
         handleLoding(false)
 
       }).catch((err) => {
         console.error({ err });
-        handleToast("Error!", "error")
+        const { status } = err.response
+        handleToast(status < 500 ? "Error HTTP 524, vuelva a intentar por favor." : "Error distinto que 500, comunicarse con el sector de tecnologia.", "error")
         handleLoding(false);
       });
 
@@ -63,12 +68,12 @@ function EsahubSales() {
     Swal.fire({
       title,
       icon,
-      toast: true,
+      /* toast: true, */
       animation: true,
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      position: 'bottom-right',
+      position: 'center',
       didOpen: (toast) => {
         toast.addEventListener("mouseenter", Swal.stopTimer);
         toast.addEventListener("mouseleave", Swal.resumeTimer);

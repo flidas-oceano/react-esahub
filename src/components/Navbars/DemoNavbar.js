@@ -121,12 +121,12 @@ function Header(props) {
           </div>
           <NavbarBrand href="/">{getBrand()}</NavbarBrand>
         </div>
-        <NavbarToggler onClick={toggle}>
+        {/* <NavbarToggler onClick={toggle}>
           <span className="navbar-toggler-bar navbar-kebab" />
           <span className="navbar-toggler-bar navbar-kebab" />
           <span className="navbar-toggler-bar navbar-kebab" />
-        </NavbarToggler>
-        <Collapse isOpen={isOpen} navbar className="justify-content-end">
+        </NavbarToggler> */}
+        {/* <Collapse isOpen={isOpen} navbar className="justify-content-end">
           <form>
             <InputGroup className="no-border">
               <Input placeholder="Search..." />
@@ -172,7 +172,7 @@ function Header(props) {
               </Link>
             </NavItem>
           </Nav>
-        </Collapse>
+        </Collapse> */}
       </Container>
     </Navbar>
   );
