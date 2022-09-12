@@ -93,16 +93,12 @@ function EsahubSales() {
             </p>
             <p>Por defecto solo puede solicitar datos en el mes actual</p>
           </Col>
-          <Col lg="12" md="12" sm="12">
+          <Col lg="6" md="6" sm="12">
             <FormGroup>
               <Card className="card-stats">
                 <CardBody>
                   <Row>
-                    <Col md="4" xs="5">
-                      
-                    </Col>
-                    
-                      <Col md="8" xs="7">
+                      <Col md="12" xs="12">
                         <div className="numbers">
                           <p className="card-category">Periodo ({moment().format("MMMM")})</p>
                           <CardTitle tag="p">
@@ -125,9 +121,41 @@ function EsahubSales() {
                                                   style={{ marginLeft: "auto", display: "block" }}
                                                   disabled={ hasRequest ? true : false}
                                                   onClick={(evt) => handleFetch(evt, moment(preview).format("YYYYMMDD"))}
-                                                >
-                                                  Solicitar
-                                                </Button>}
+                                                >Solicitar</Button>}
+                  
+                </CardFooter>
+              </Card>
+            </FormGroup>
+          </Col>
+          <Col lg="6" md="6" sm="12">
+            <FormGroup>
+              <Card className="card-stats">
+                <CardBody>
+                  <Row>
+                      <Col md="12" xs="12">
+                        <div className="numbers">
+                          <p className="card-category">Periodo ({moment().format("MMMM")})</p>
+                          <CardTitle tag="p">
+                            {moment(preview).format("DD/MM/YYYY")} hasta{" "}
+                            {moment(preview)
+                              .endOf("month")
+                              .format("DD/MM/YYYY")
+                              .toString()}
+                          </CardTitle>
+                        </div>
+                      </Col>
+                    
+                  </Row>
+                </CardBody>
+                <CardFooter>
+                  <hr />
+
+            { hasRequest ? <SimpleLoading /> : <Button
+                                                  color="success"
+                                                  style={{ marginLeft: "auto", display: "block" }}
+                                                  disabled={ hasRequest ? true : false}
+                                                  onClick={(evt) => handleFetch(evt, moment(preview).format("YYYYMMDD"))}
+                                                >Solicitar</Button>}
                   
                 </CardFooter>
               </Card>
