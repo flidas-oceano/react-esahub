@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 // reactstrap components
 import {
   Card,
@@ -9,6 +9,8 @@ import {
   Col,
   FormGroup,
   Button,
+  Label,
+  Input,
 } from "reactstrap";
 
 import axios from "axios";
@@ -18,53 +20,71 @@ import SimpleLoading from "components/Loading/SimpleLoading";
 
 function EsahubSales() {
 
-  const [preview, setPreview] = useState("");
   const [hasRequest, setHasRequest] = useState(false);
+  const [hasSpecialRequest, setHasSpecialRequest] = useState(false);
+  const [option, setOption] = useState(false);
+  const [preview, setPreview] = useState("");
+  const selectRef = useRef();
 
   useEffect(() => {
-    moment.locale("es",{
-        months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
-        monthsShort: 'Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.'.split('_'),
-        weekdays: 'Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado'.split('_'),
-        weekdaysShort: 'Dom._Lun._Mar._Mier._Jue._Vier._Sab.'.split('_'),
-        weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sa'.split('_')
-      });
+    moment.locale("es", {
+      months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
+      monthsShort: 'Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.'.split('_'),
+      weekdays: 'Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado'.split('_'),
+      weekdaysShort: 'Dom._Lun._Mar._Mier._Jue._Vier._Sab.'.split('_'),
+      weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sa'.split('_')
+    });
+
+    console.log(option)
 
     setPreview(moment().format("YYYY/MM/01"))
   }, [hasRequest]);
 
 
-  const handleLoding = (status) =>{
-    setHasRequest(status);
+  const handleLoading = (status, type) => {
+    if(type === 'special'){
+      setHasSpecialRequest(status);
+    }else{
+      setHasRequest(status);
+    }
   }
 
-  const handleFetch = (evt, fromPeriod) => {
-    console.log({fromPeriod})
-    handleLoding(true)
-    const url = `https://www.oceanomedicina.net/laravel-foclis/api/esahub/ventas-por-pedido${
-      fromPeriod && `?period=${fromPeriod}`
-    }`;
+  const handleOption = (evt) => {
+    console.log(evt.target.value)
+    const optionValue = evt.target.value === "Seleccione una opcion" ? false : evt.target.value
+    setOption(optionValue);
+    setPreview(evt.target.value);
+  }
+
+  const handleFetch = (evt, fromPeriod, fromRequest) => {
+    console.log({ fromPeriod })
+
+      handleLoading(true, fromRequest)
+    
+    const url = `https://www.oceanomedicina.net/laravel-foclis/api/esahub/ventas-por-pedido${fromPeriod && `?period=${fromPeriod}`
+      }`;
 
     axios.get(url)
       .then((res) => {
-        console.log({ data: res.data });
-        const { AppendResposeBody, UpdateResposeHeader, new_values } = res.data
+        const { data, headerNames } = res.data
+        console.log({ res, data });
         let message = `
-            Solicitud completa!, nuevos datos que se sumaron al Sheet: ${new_values.length}
+            Solicitud completa!, nuevos datos que se sumaron al Sheet: ${data.length}
         `
+
         handleToast(message, "success")
-        handleLoding(false)
+        handleLoading(false, fromRequest)
 
       }).catch((err) => {
         console.error({ err });
-        const { status } = err.response
+       const { status } = err.response
         handleToast(status < 500 ? "Error HTTP 524, vuelva a intentar por favor." : "Error distinto que 500, comunicarse con el sector de tecnologia.", "error")
-        handleLoding(false);
+        handleLoading(false, fromRequest);
       });
 
   };
 
-  const handleToast = (title, icon) =>{
+  const handleToast = (title, icon) => {
     Swal.fire({
       title,
       icon,
@@ -84,7 +104,7 @@ function EsahubSales() {
   return (
     <>
       <div className="content">
-        <Row>
+        <Row >
           <Col lg="12" md="12" sm="12">
             <h1>Ventas por pedidos a ESAHUB</h1>
             <p>
@@ -93,36 +113,38 @@ function EsahubSales() {
             </p>
             <p>Por defecto solo puede solicitar datos en el mes actual</p>
           </Col>
+          </Row>
+          <Row className="h-100 align-items-stretch">
           <Col lg="6" md="6" sm="12">
             <FormGroup>
               <Card className="card-stats">
                 <CardBody>
                   <Row>
-                      <Col md="12" xs="12">
-                        <div className="numbers">
-                          <p className="card-category">Periodo ({moment().format("MMMM")})</p>
-                          <CardTitle tag="p">
-                            {moment(preview).format("DD/MM/YYYY")} hasta{" "}
-                            {moment(preview)
-                              .endOf("month")
-                              .format("DD/MM/YYYY")
-                              .toString()}
-                          </CardTitle>
-                        </div>
-                      </Col>
-                    
+                    <Col md="12" xs="12">
+                      <div className="numbers">
+                        <p className="card-category">Periodo ({moment().format("MMMM")})</p>
+                        <CardTitle tag="p">
+                          {moment().format("01/MM/YYYY")} hasta{" "}
+                          {moment()
+                            .endOf("month")
+                            .format("DD/MM/YYYY")
+                            .toString()}
+                        </CardTitle>
+                      </div>
+                    </Col>
+
                   </Row>
                 </CardBody>
                 <CardFooter>
                   <hr />
 
-            { hasRequest ? <SimpleLoading /> : <Button
-                                                  color="success"
-                                                  style={{ marginLeft: "auto", display: "block" }}
-                                                  disabled={ hasRequest ? true : false}
-                                                  onClick={(evt) => handleFetch(evt, moment(preview).format("YYYYMMDD"))}
-                                                >Solicitar</Button>}
-                  
+                  {hasRequest ? <SimpleLoading /> : <Button
+                    color="success"
+                    style={{ marginLeft: "auto", display: "block" }}
+                    disabled={hasRequest ? true : false}
+                    onClick={(evt) => handleFetch(evt, moment().format("YYYYMM01"), 'normal')}
+                  >Solicitar</Button>}
+
                 </CardFooter>
               </Card>
             </FormGroup>
@@ -132,35 +154,67 @@ function EsahubSales() {
               <Card className="card-stats">
                 <CardBody>
                   <Row>
-                      <Col md="12" xs="12">
-                        <div className="numbers">
-                          <p className="card-category">Periodo ({moment().format("MMMM")})</p>
-                          <CardTitle tag="p">
-                            {moment(preview).format("DD/MM/YYYY")} hasta{" "}
-                            {moment(preview)
-                              .endOf("month")
-                              .format("DD/MM/YYYY")
-                              .toString()}
-                          </CardTitle>
-                        </div>
-                      </Col>
-                    
+                    <Col md="12" xs="12">
+                      <Label for="monthSelect">
+                        Seleccione el periodo mensual {option && "("+moment(preview).format("MMMM")+")"}
+                      </Label>
+                      <Input
+                        ref={selectRef}
+                        type="select"
+                        name="select"
+                        id="monthSelect"
+                        onChange={handleOption}
+                      >
+                        <option defaultValue >
+                          Seleccione una opcion
+                        </option>
+                        <option value={moment("1/1/22").format("YYYYMM01")}>Enero</option>
+                        <option value={moment("2/1/22").format("YYYYMM01")}>Febrero</option>
+                        <option value={moment("3/1/22").format("YYYYMM01")}>Marzo</option>
+                        <option value={moment("4/1/22").format("YYYYMM01")}>Abril</option>
+                        <option value={moment("5/1/22").format("YYYYMM01")}>Mayo</option>
+                        <option value={moment("6/1/22").format("YYYYMM01")}>Junio</option>
+                        <option value={moment("7/1/22").format("YYYYMM01")}>Julio</option>
+                        <option value={moment("8/1/22").format("YYYYMM01")}>Agosto</option>
+                        <option value={moment("9/1/22").format("YYYYMM01")}>Septiembre</option>
+                        <option value={moment("10/1/22").format("YYYYMM01")}>Octubre</option>
+                        <option value={moment("11/1/22").format("YYYYMM01")}>Noviembre</option>
+                        <option value={moment("12/1/22").format("YYYYMM01")}>Diciembre</option>
+
+                      </Input>
+                      {preview && option && (
+                        <Col md="12" xs="12">
+                          <div className="numbers">
+                            <CardTitle tag="p" >
+                              {moment(preview).format("01/MM/YYYY") + " hasta " +
+                              moment(preview)
+                                .endOf("month")
+                                .format("DD/MM/YYYY")
+                                .toString()}
+                            </CardTitle>
+                          </div>
+                        </Col>
+                      )}
+                    </Col>
+
                   </Row>
                 </CardBody>
                 <CardFooter>
                   <hr />
 
-            { hasRequest ? <SimpleLoading /> : <Button
-                                                  color="success"
-                                                  style={{ marginLeft: "auto", display: "block" }}
-                                                  disabled={ hasRequest ? true : false}
-                                                  onClick={(evt) => handleFetch(evt, moment(preview).format("YYYYMMDD"))}
-                                                >Solicitar</Button>}
-                  
+                  {hasSpecialRequest ? <SimpleLoading /> : <Button
+                    color="success"
+                    style={{ marginLeft: "auto", display: "block" }}
+                    disabled={!option ? true : false}
+                    onClick={(evt) => handleFetch(evt, moment(preview).format("YYYYMMDD"), 'special')}
+                  >Solicitar</Button>}
+
                 </CardFooter>
               </Card>
             </FormGroup>
           </Col>
+          </Row>
+          <Row>
           <Col lg="12" md="12" sm="12">
             <Card className="card-stats">
               <CardBody>
@@ -173,7 +227,7 @@ function EsahubSales() {
                   <Col md="9" xs="12">
                     <p className="mt-2 mb-0">
                       Actualmente esta establecido que la consulta de las ventas
-                      en ESAHUB se realizan a principio de mes
+                      en ESAHUB se realizan cada sabado del mes
                     </p>
                   </Col>
                 </Row>
