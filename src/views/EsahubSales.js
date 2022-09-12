@@ -35,10 +35,9 @@ function EsahubSales() {
       weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sa'.split('_')
     });
 
-    console.log(option)
 
     setPreview(moment().format("YYYY/MM/01"))
-  }, [hasRequest]);
+  }, [hasRequest, hasSpecialRequest]);
 
 
   const handleLoading = (status, type) => {
