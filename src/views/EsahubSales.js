@@ -65,10 +65,9 @@ function EsahubSales() {
 
     axios.get(url)
       .then((res) => {
-        const { data, headerNames } = res.data
-        console.log({ res, data });
+        const { new_values } = res.data.original;
         let message = `
-            Solicitud completa!, nuevos datos que se sumaron al Sheet: ${data.length}
+            Solicitud completa!, nuevos datos que se sumaron al Sheet: ${new_values.length} 
         `
 
         handleToast(message, "success")
