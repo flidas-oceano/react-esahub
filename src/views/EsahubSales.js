@@ -60,6 +60,14 @@ function EsahubSales() {
     setPreview(evt.target.value);
   };
 
+  const handleOptionYear = (evt) => {
+    console.log(evt.target.value);
+    const optionValue =
+      evt.target.value === "Seleccione una año" ? false : evt.target.value;
+    setOption(optionValue);
+    setPreview(evt.target.value);
+  };
+
   const handleFetch = (evt, fromPeriod, fromRequest) => {
     console.log({ fromPeriod });
 
@@ -227,7 +235,7 @@ function EsahubSales() {
                         type="select"
                         name="select"
                         id="monthSelect"
-                        onChange={handleOption}
+                        onChange={handleOptionYear}
                       >
                         <option defaultValue>Seleccione una año</option>
                         <option value={moment("1/1/22").format("YYYY")}>
