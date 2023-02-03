@@ -22,6 +22,7 @@ function EsahubSales() {
   const [hasRequest, setHasRequest] = useState(false);
   const [hasSpecialRequest, setHasSpecialRequest] = useState(false);
   const [option, setOption] = useState(false);
+  const [optionYear, setOptionYear] = useState(2023);
   const [preview, setPreview] = useState("");
   const selectRef = useRef();
   const selectYearRef = useRef();
@@ -41,8 +42,12 @@ function EsahubSales() {
       weekdaysMin: "Do_Lu_Ma_Mi_Ju_Vi_Sa".split("_"),
     });
 
-    setPreview(moment(option).format("YYYY/MM/01"));
-  }, [hasRequest, hasSpecialRequest]);
+
+    const monthOfOption = moment(option).format('MM')
+    const datePreview = `${monthOfOption}/01/${optionYear}`
+
+    setPreview(moment(datePreview).format("YYYY/MM/01"));
+  }, [hasRequest, hasSpecialRequest, optionYear, option]);
 
   const handleLoading = (status, type) => {
     if (type === "special") {
@@ -63,9 +68,9 @@ function EsahubSales() {
   const handleOptionYear = (evt) => {
     console.log(evt.target.value);
     const optionValue =
-      evt.target.value === "Seleccione una año" ? false : evt.target.value;
-    setOption(optionValue);
-    setPreview(evt.target.value);
+      evt.target.value === "Seleccione un año" ? false : evt.target.value;
+    setOptionYear(optionValue);
+    //setPreview(evt.target.value);
   };
 
   const handleFetch = (evt, fromPeriod, fromRequest) => {
@@ -108,9 +113,7 @@ function EsahubSales() {
       icon,
       /* toast: true, */
       animation: true,
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
+      showConfirmButton: true,
       position: "center",
       didOpen: (toast) => {
         toast.addEventListener("mouseenter", Swal.stopTimer);
@@ -185,7 +188,10 @@ function EsahubSales() {
                         Seleccione el periodo mensual{" "}
                         {option && "(" + moment(option).format("MMMM") + ")"}
                       </Label>
-                      <Input
+
+                      <Row>
+                        <Col md="6">
+                        <Input
                         ref={selectRef}
                         type="select"
                         name="select"
@@ -193,58 +199,66 @@ function EsahubSales() {
                         onChange={handleOption}
                       >
                         <option defaultValue>Seleccione una opcion</option>
-                        <option value={moment("1/1/22").format("YYYYMM01")}>
+                        <option value={moment("1/1/23").format("YYYYMM01")}>
                           Enero
                         </option>
-                        <option value={moment("2/1/22").format("YYYYMM01")}>
+                        <option value={moment("2/1/23").format("YYYYMM01")}>
                           Febrero
                         </option>
-                        <option value={moment("3/1/22").format("YYYYMM01")}>
+                        <option value={moment("3/1/23").format("YYYYMM01")}>
                           Marzo
                         </option>
-                        <option value={moment("4/1/22").format("YYYYMM01")}>
+                        <option value={moment("4/1/23").format("YYYYMM01")}>
                           Abril
                         </option>
-                        <option value={moment("5/1/22").format("YYYYMM01")}>
+                        <option value={moment("5/1/23").format("YYYYMM01")}>
                           Mayo
                         </option>
-                        <option value={moment("6/1/22").format("YYYYMM01")}>
+                        <option value={moment("6/1/23").format("YYYYMM01")}>
                           Junio
                         </option>
-                        <option value={moment("7/1/22").format("YYYYMM01")}>
+                        <option value={moment("7/1/23").format("YYYYMM01")}>
                           Julio
                         </option>
-                        <option value={moment("8/1/22").format("YYYYMM01")}>
+                        <option value={moment("8/1/23").format("YYYYMM01")}>
                           Agosto
                         </option>
-                        <option value={moment("9/1/22").format("YYYYMM01")}>
+                        <option value={moment("9/1/23").format("YYYYMM01")}>
                           Septiembre
                         </option>
-                        <option value={moment("10/1/22").format("YYYYMM01")}>
+                        <option value={moment("10/1/23").format("YYYYMM01")}>
                           Octubre
                         </option>
-                        <option value={moment("11/1/22").format("YYYYMM01")}>
+                        <option value={moment("11/1/23").format("YYYYMM01")}>
                           Noviembre
                         </option>
-                        <option value={moment("12/1/22").format("YYYYMM01")}>
+                        <option value={moment("12/1/23").format("YYYYMM01")}>
                           Diciembre
                         </option>
                       </Input>
-                      <Input
+                        </Col>
+                        <Col md="6">
+                        <Input
                         ref={selectYearRef}
                         type="select"
                         name="select"
                         id="monthSelect"
                         onChange={handleOptionYear}
+                       
                       >
-                        <option defaultValue>Seleccione una año</option>
-                        <option value={moment("1/1/22").format("YYYY")}>
+                        <option>Seleccione un año</option>
+                        <option value={2022}>
                           2022
                         </option>
-                        <option value={moment("2/1/22").format("YYYY")}>
+                        <option selected value={2023}>
                           2023
                         </option>
                       </Input>
+                        </Col>
+
+                      </Row>
+                      
+                      
                       {preview && option && (
                         <Col md="12" xs="12">
                           <div className="numbers">
