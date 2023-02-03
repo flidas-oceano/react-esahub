@@ -35,11 +35,11 @@ var routes = [
     layout: "/admin"
   }, */
   {
-    path: "/esahub",
+    path: "/",
     name: "Esahub",
     icon: "nc-icon nc-bank",
     component: EsahubSales,
-    layout: "/admin"
+    layout: "/admin",
   },
   /* {
     path: "/icons",

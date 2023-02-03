@@ -27,6 +27,7 @@ import Sidebar from "components/Sidebar/Sidebar.js";
 /* import FixedPlugin from "components/FixedPlugin/FixedPlugin.js"; */
 
 import routes from "routes.js";
+import EsahubSales from "views/EsahubSales";
 
 var ps;
 
@@ -66,7 +67,8 @@ function Dashboard(props) {
         activeColor={activeColor}
       />
       <div className="main-panel" ref={mainPanel}>
-        <DemoNavbar {...props} />
+        {/* <DemoNavbar {...props} /> */}
+        <EsahubSales />
         <Switch>
           {routes.map((prop, key) => {
             return (
@@ -80,7 +82,7 @@ function Dashboard(props) {
         </Switch>
         <Footer fluid />
       </div>
-       {/* <FixedPlugin
+      {/* <FixedPlugin
         bgColor={backgroundColor}
         activeColor={activeColor}
         handleActiveClick={handleActiveClick}

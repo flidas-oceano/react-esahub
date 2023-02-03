@@ -19,68 +19,79 @@ import Swal from "sweetalert2";
 import SimpleLoading from "components/Loading/SimpleLoading";
 
 function EsahubSales() {
-
   const [hasRequest, setHasRequest] = useState(false);
   const [hasSpecialRequest, setHasSpecialRequest] = useState(false);
   const [option, setOption] = useState(false);
   const [preview, setPreview] = useState("");
   const selectRef = useRef();
+  const selectYearRef = useRef();
 
   useEffect(() => {
     moment.locale("es", {
-      months: 'Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre'.split('_'),
-      monthsShort: 'Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.'.split('_'),
-      weekdays: 'Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado'.split('_'),
-      weekdaysShort: 'Dom._Lun._Mar._Mier._Jue._Vier._Sab.'.split('_'),
-      weekdaysMin: 'Do_Lu_Ma_Mi_Ju_Vi_Sa'.split('_')
+      months:
+        "Enero_Febrero_Marzo_Abril_Mayo_Junio_Julio_Agosto_Septiembre_Octubre_Noviembre_Diciembre".split(
+          "_"
+        ),
+      monthsShort:
+        "Enero._Feb._Mar_Abr._May_Jun_Jul._Ago_Sept._Oct._Nov._Dec.".split("_"),
+      weekdays: "Domingo_Lunes_Martes_Miercoles_Jueves_Viernes_Sabado".split(
+        "_"
+      ),
+      weekdaysShort: "Dom._Lun._Mar._Mier._Jue._Vier._Sab.".split("_"),
+      weekdaysMin: "Do_Lu_Ma_Mi_Ju_Vi_Sa".split("_"),
     });
 
-
-    setPreview(moment().format("YYYY/MM/01"))
+    setPreview(moment(option).format("YYYY/MM/01"));
   }, [hasRequest, hasSpecialRequest]);
 
-
   const handleLoading = (status, type) => {
-    if(type === 'special'){
+    if (type === "special") {
       setHasSpecialRequest(status);
-    }else{
+    } else {
       setHasRequest(status);
     }
-  }
+  };
 
   const handleOption = (evt) => {
-    console.log(evt.target.value)
-    const optionValue = evt.target.value === "Seleccione una opcion" ? false : evt.target.value
+    console.log(evt.target.value);
+    const optionValue =
+      evt.target.value === "Seleccione una opcion" ? false : evt.target.value;
     setOption(optionValue);
     setPreview(evt.target.value);
-  }
+  };
 
   const handleFetch = (evt, fromPeriod, fromRequest) => {
-    console.log({ fromPeriod })
+    console.log({ fromPeriod });
 
-      handleLoading(true, fromRequest)
-    
-    const url = `https://www.oceanomedicina.net/laravel-foclis/api/esahub/ventas-por-pedido${fromPeriod && `?period=${fromPeriod}`
-      }`;
+    handleLoading(true, fromRequest);
 
-    axios.get(url)
+    const url = `https://www.oceanomedicina.net/laravel-foclis/api/esahub/ventas-por-pedido${
+      fromPeriod && `?period=${fromPeriod}`
+    }`;
+
+    axios
+      .get(url)
       .then((res) => {
-        const { data, headerNames } = res.data
+        const { data } = res;
         console.log({ res, data });
-        let message = `
-            Solicitud completa!, nuevos datos que se sumaron al Sheet: ${data.length}
-        `
+        const message = `
+            ¡Solicitud completa!
+        `;
 
-        handleToast(message, "success")
-        handleLoading(false, fromRequest)
-
-      }).catch((err) => {
+        handleToast(message, "success");
+        handleLoading(false, fromRequest);
+      })
+      .catch((err) => {
         console.error({ err });
-       const { status } = err.response
-        handleToast(status < 500 ? "Error HTTP 524, vuelva a intentar por favor." : "Error distinto que 500, comunicarse con el sector de tecnologia.", "error")
+        const { status } = err.response;
+        handleToast(
+          status < 500
+            ? "Error HTTP 524, vuelva a intentar por favor."
+            : "Error distinto que 500, comunicarse con el sector de tecnologia.",
+          "error"
+        );
         handleLoading(false, fromRequest);
       });
-
   };
 
   const handleToast = (title, icon) => {
@@ -92,18 +103,18 @@ function EsahubSales() {
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true,
-      position: 'center',
+      position: "center",
       didOpen: (toast) => {
         toast.addEventListener("mouseenter", Swal.stopTimer);
         toast.addEventListener("mouseleave", Swal.resumeTimer);
       },
     });
-  }
+  };
 
   return (
     <>
       <div className="content">
-        <Row >
+        <Row>
           <Col lg="12" md="12" sm="12">
             <h1>Ventas por pedidos a ESAHUB</h1>
             <p>
@@ -112,8 +123,8 @@ function EsahubSales() {
             </p>
             <p>Por defecto solo puede solicitar datos en el mes actual</p>
           </Col>
-          </Row>
-          <Row className="h-100 align-items-stretch">
+        </Row>
+        <Row className="h-100 align-items-stretch">
           <Col lg="6" md="6" sm="12">
             <FormGroup>
               <Card className="card-stats">
@@ -121,7 +132,9 @@ function EsahubSales() {
                   <Row>
                     <Col md="12" xs="12">
                       <div className="numbers">
-                        <p className="card-category">Periodo ({moment().format("MMMM")})</p>
+                        <p className="card-category">
+                          Periodo ({moment().format("MMMM")})
+                        </p>
                         <CardTitle tag="p">
                           {moment().format("01/MM/YYYY")} hasta{" "}
                           {moment()
@@ -131,19 +144,25 @@ function EsahubSales() {
                         </CardTitle>
                       </div>
                     </Col>
-
                   </Row>
                 </CardBody>
                 <CardFooter>
                   <hr />
 
-                  {hasRequest ? <SimpleLoading /> : <Button
-                    color="success"
-                    style={{ marginLeft: "auto", display: "block" }}
-                    disabled={hasRequest ? true : false}
-                    onClick={(evt) => handleFetch(evt, moment().format("YYYYMM01"), 'normal')}
-                  >Solicitar</Button>}
-
+                  {hasRequest ? (
+                    <SimpleLoading />
+                  ) : (
+                    <Button
+                      color="success"
+                      style={{ marginLeft: "auto", display: "block" }}
+                      disabled={hasRequest ? true : false}
+                      onClick={(evt) =>
+                        handleFetch(evt, moment().format("YYYYMM01"), "normal")
+                      }
+                    >
+                      Solicitar
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             </FormGroup>
@@ -155,7 +174,8 @@ function EsahubSales() {
                   <Row>
                     <Col md="12" xs="12">
                       <Label for="monthSelect">
-                        Seleccione el periodo mensual {option && "("+moment(preview).format("MMMM")+")"}
+                        Seleccione el periodo mensual{" "}
+                        {option && "(" + moment(option).format("MMMM") + ")"}
                       </Label>
                       <Input
                         ref={selectRef}
@@ -164,56 +184,103 @@ function EsahubSales() {
                         id="monthSelect"
                         onChange={handleOption}
                       >
-                        <option defaultValue >
-                          Seleccione una opcion
+                        <option defaultValue>Seleccione una opcion</option>
+                        <option value={moment("1/1/22").format("YYYYMM01")}>
+                          Enero
                         </option>
-                        <option value={moment("1/1/22").format("YYYYMM01")}>Enero</option>
-                        <option value={moment("2/1/22").format("YYYYMM01")}>Febrero</option>
-                        <option value={moment("3/1/22").format("YYYYMM01")}>Marzo</option>
-                        <option value={moment("4/1/22").format("YYYYMM01")}>Abril</option>
-                        <option value={moment("5/1/22").format("YYYYMM01")}>Mayo</option>
-                        <option value={moment("6/1/22").format("YYYYMM01")}>Junio</option>
-                        <option value={moment("7/1/22").format("YYYYMM01")}>Julio</option>
-                        <option value={moment("8/1/22").format("YYYYMM01")}>Agosto</option>
-                        <option value={moment("9/1/22").format("YYYYMM01")}>Septiembre</option>
-                        <option value={moment("10/1/22").format("YYYYMM01")}>Octubre</option>
-                        <option value={moment("11/1/22").format("YYYYMM01")}>Noviembre</option>
-                        <option value={moment("12/1/22").format("YYYYMM01")}>Diciembre</option>
-
+                        <option value={moment("2/1/22").format("YYYYMM01")}>
+                          Febrero
+                        </option>
+                        <option value={moment("3/1/22").format("YYYYMM01")}>
+                          Marzo
+                        </option>
+                        <option value={moment("4/1/22").format("YYYYMM01")}>
+                          Abril
+                        </option>
+                        <option value={moment("5/1/22").format("YYYYMM01")}>
+                          Mayo
+                        </option>
+                        <option value={moment("6/1/22").format("YYYYMM01")}>
+                          Junio
+                        </option>
+                        <option value={moment("7/1/22").format("YYYYMM01")}>
+                          Julio
+                        </option>
+                        <option value={moment("8/1/22").format("YYYYMM01")}>
+                          Agosto
+                        </option>
+                        <option value={moment("9/1/22").format("YYYYMM01")}>
+                          Septiembre
+                        </option>
+                        <option value={moment("10/1/22").format("YYYYMM01")}>
+                          Octubre
+                        </option>
+                        <option value={moment("11/1/22").format("YYYYMM01")}>
+                          Noviembre
+                        </option>
+                        <option value={moment("12/1/22").format("YYYYMM01")}>
+                          Diciembre
+                        </option>
+                      </Input>
+                      <Input
+                        ref={selectYearRef}
+                        type="select"
+                        name="select"
+                        id="monthSelect"
+                        onChange={handleOption}
+                      >
+                        <option defaultValue>Seleccione una año</option>
+                        <option value={moment("1/1/22").format("YYYY")}>
+                          2022
+                        </option>
+                        <option value={moment("2/1/22").format("YYYY")}>
+                          2023
+                        </option>
                       </Input>
                       {preview && option && (
                         <Col md="12" xs="12">
                           <div className="numbers">
-                            <CardTitle tag="p" >
-                              {moment(preview).format("01/MM/YYYY") + " hasta " +
-                              moment(preview)
-                                .endOf("month")
-                                .format("DD/MM/YYYY")
-                                .toString()}
+                            <CardTitle tag="p">
+                              {moment(preview).format("01/MM/YYYY") +
+                                " hasta " +
+                                moment(preview)
+                                  .endOf("month")
+                                  .format("DD/MM/YYYY")
+                                  .toString()}
                             </CardTitle>
                           </div>
                         </Col>
                       )}
                     </Col>
-
                   </Row>
                 </CardBody>
                 <CardFooter>
                   <hr />
 
-                  {hasSpecialRequest ? <SimpleLoading /> : <Button
-                    color="success"
-                    style={{ marginLeft: "auto", display: "block" }}
-                    disabled={!option ? true : false}
-                    onClick={(evt) => handleFetch(evt, moment(preview).format("YYYYMMDD"), 'special')}
-                  >Solicitar</Button>}
-
+                  {hasSpecialRequest ? (
+                    <SimpleLoading />
+                  ) : (
+                    <Button
+                      color="success"
+                      style={{ marginLeft: "auto", display: "block" }}
+                      disabled={!option ? true : false}
+                      onClick={(evt) =>
+                        handleFetch(
+                          evt,
+                          moment(preview).format("YYYYMMDD"),
+                          "special"
+                        )
+                      }
+                    >
+                      Solicitar
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             </FormGroup>
           </Col>
-          </Row>
-          <Row>
+        </Row>
+        <Row>
           <Col lg="12" md="12" sm="12">
             <Card className="card-stats">
               <CardBody>

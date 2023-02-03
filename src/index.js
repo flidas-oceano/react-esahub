@@ -18,7 +18,7 @@
 */
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch, Redirect, HashRouter } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "./assets/scss/paper-dashboard.scss?v=1.3.0";
@@ -30,10 +30,16 @@ import AdminLayout from "layouts/Admin.js";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
+  <HashRouter>
     <Switch>
-      <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-      <Redirect to="/admin/esahub" />
+      <Route
+        path="/admin"
+        render={(props) => {
+          console.log({ props });
+          return <AdminLayout {...props} />;
+        }}
+      />
+      {/* <Redirect to="/admin/esahub" /> */}
     </Switch>
-  </BrowserRouter>
+  </HashRouter>
 );
